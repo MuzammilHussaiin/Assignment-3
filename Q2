@@ -1,0 +1,129 @@
+#include <iostream>
+#include <string>
+
+
+class Product {
+public:
+    int productId;
+    std::string productName;
+    double price;
+
+ 
+    Product(int id, const std::string& name, double p) : productId(id), productName(name), price(p) {}
+
+
+    void displayDetails() {
+        std::cout << "Product ID: " << productId << ", Name: " << productName << ", Price: $" << price << std::endl;
+    }
+};
+
+
+class ShoppingCart {
+private:
+    Product** products; 
+    int size;
+public:
+   
+    ShoppingCart() : products(nullptr), size(0) {}
+
+    ~ShoppingCart() {
+        if (products != nullptr) {
+            for (int i = 0; i < size; ++i) {
+                delete products[i];
+            }
+            delete[] products;
+        }
+    }
+
+ 
+    void addProduct(Product* product) {
+  
+        if (products == nullptr) {
+            products = new Product * [1];
+        }
+        else {
+     
+            Product** temp = new Product * [size + 1];
+            for (int i = 0; i < size; ++i) {
+                temp[i] = products[i];
+            }
+            delete[] products;
+            products = temp;
+        }
+
+    
+        products[size++] = product;
+    }
+
+
+    void displayProducts() {
+        std::cout << "Products in the cart:" << std::endl;
+        for (int i = 0; i < size; ++i) {
+            products[i]->displayDetails();
+        }
+    }
+
+ 
+    double calculateTotalCost() {
+        double total = 0.0;
+        for (int i = 0; i < size; ++i) {
+            total += products[i]->price;
+        }
+        return total;
+    }
+};
+
+
+class User {
+public:
+    int userId;
+    ShoppingCart* cart; 
+
+
+    User(int id) : userId(id), cart(nullptr) {}
+
+
+    void displayDetails() {
+        std::cout << "User ID: " << userId << std::endl;
+    }
+};
+
+int main() {
+
+    Product* laptop = new Product(1, "Ps5", 999.99);
+    Product* phone = new Product(2, "GPU", 299.99);
+
+  
+    User* user1 = new User(101);
+    User* user2 = new User(102);
+
+
+    user1->cart = new ShoppingCart();
+    user2->cart = new ShoppingCart();
+
+  
+    user1->cart->addProduct(laptop);
+    user2->cart->addProduct(phone);
+
+ 
+    user1->cart->addProduct(new Product(3, "Gaming headphones", 199.99));
+
+ 
+    user1->displayDetails();
+    user1->cart->displayProducts();
+    std::cout << "Total Cost: $" << user1->cart->calculateTotalCost() << std::endl;
+
+    user2->displayDetails();
+    user2->cart->displayProducts();
+    std::cout << "Total Cost: $" << user2->cart->calculateTotalCost() << std::endl;
+
+    delete laptop;
+    delete phone;
+    delete user1->cart;
+    delete user1;
+
+    delete user2->cart;
+    delete user2;
+
+    return 0;
+}
